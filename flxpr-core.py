@@ -190,7 +190,7 @@ async def unloader_cmd(_, message: Message):
             f"<b>{unloaderTitle}</b>" f"\n\nМодуль <b>{name}</b> успешно удален"
         )
 
-    #        restart(message, "restart")
+        restart(message, "restart")
     except IndexError:
         await message.edit(
             f"<b>{coreTitle}</b>"
