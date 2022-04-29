@@ -44,7 +44,7 @@ repository = "github.com/flxprhub/modules"
 creator = "@flxpr"
 channel = "@flxpr_modules"
 website = "flxpr.ru/modules"
-version = "1.1.1"
+version = "1.1.2"
 # env = "production"
 
 
@@ -56,7 +56,8 @@ async def core_cmd(_, message: Message):
             f"\n\nВерсия: <code>{version}</code>"
             f"\n\nКанал с модулями: <b>{channel}</b>"
             f"\nРепозиторий на <b>GitHub'е</b>: <b>{repository}</b>"
-            f"\n\nПрочее (список команд итп): <code>,h flxpr-core</code>"
+            f"\n\nПрочее (список команд итп): <code>,h flxpr-core</code>",
+            disable_web_page_preview=True
         )
     except IndexError:
         await message.edit(
