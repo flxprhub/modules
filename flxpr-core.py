@@ -44,7 +44,7 @@ repository = "github.com/flxprhub/modules"
 creator = "@flxpr"
 channel = "@flxpr_modules"
 website = "flxpr.ru/modules"
-version = "1.0.6"
+version = "1.1.1"
 # env = "production"
 
 
@@ -73,7 +73,6 @@ async def loader_cmd(_, message: Message):
         await message.edit(
             f"<b>{loaderTitle}</b>"
             f"\n\nНачинаю установку модуля <b>{name}</b>"
-            #             f"\n<b>⚡ Дополнительная информация</b>: {defaultInfo}"
         )
 
         await message.edit(
@@ -130,48 +129,40 @@ async def updater_cmd(_, message: Message):
         await message.edit(
             f"<b>{updaterTitle}</b>"
             f"\n\nНачинаю обновление модуля <b>{name}</b>"
-            #             f"\n<b>⚡ Дополнительная информация</b>: {defaultInfo}"
         )
 
-        await message.edit(
-            f"<b>{updaterTitle}</b>" f"\n\nОбновляю модуль <b>{name}</b>"
-        )
-
+        '''
         if f"custom.{name}" in modules_dict.deleted or modules_dict.module_in(
             f"custom.{name}"
         ):
             await message.edit(
                 f"<b>{updaterTitle}</b>"
-                f"\n\nМодуль не был установлен ранее, используйте <code>,fi {name}</code> для его установки"
+                f"\n\nМодуль не был установлен ранее, используйте <code>,fl {name}</code> для его установки"
             )
-
             return
+        '''
 
         async with session.get(
-            f"https://raw.githubusercontent.com/flxprhub/modules/main/{name}.py"
+            f"https://raw.githubusercontent.com/flxprhub/modules/master/{name}.py"
         ) as response:
-            if response.status != 200:
+            if not response.ok:
                 await message.edit(
-                    f"<b>{updaterTitle}</b>"
+                    f"<b>{loaderTitle}</b>"
                     f"\n\nДанного модуля нет в репозитории на <b>GitHub'е</b>"
                 )
                 return
+            else:
+                data = await response.read()
 
         async with open(f"custom/{name}.py", "wb") as f:
             await message.edit(
                 f"<b>{updaterTitle}</b>" f"\n\nМодуль найден, <b>обновляю</b>"
             )
-
-            os.remove(f"custom/{name}.py")
-            await unload_module(f"custom.{name}")
-
-            await f.write(await response.read())
+            await f.write(data)
 
             await message.edit(
                 f"<b>{updaterTitle}</b>" f"\n\nМодуль обновлен, <b>спасибо</b> за использование моих модулей!"
             )
-            
-            await load_module(f"custom.{name}")
             restart(message, "restart")
     except IndexError:
         await message.edit(
