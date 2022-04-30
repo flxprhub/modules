@@ -1,93 +1,76 @@
 import os
-import sys
 
 from aiofile import async_open as open
 
-from helper import module, Message, db, session
-from helper.module import load_module, unload_module, all_off_modules
+from helper import module, Message, session
+from helper.module import unload_module
 from helper.misc import modules_dict
 
 from modules.updater import restart
 
-coreTitle = "flxpr-core"
-coreCommands = ["flxpr-core", "core", "fcore", "fc"]
-coreArguments = ["без аргументов"]
-coreDescription = "без описания"
+core_title = "flxpr-core"
+core_cmds = ["flxpr-core", "core", "fcore", "fc"]
+core_args = ["без аргументов"]
+core_desc = "без описания"
 
-loaderTitle = "flxpr-loader"
-loaderCommands = ["flxpr-loader", "loader", "floader", "fl"]
-loaderArguments = ["модуль к установке"]
-loaderDescription = "без описания"
+loader_title = "flxpr-loader"
+loader_cmds = ["flxpr-loader", "loader", "floader", "fl"]
+loader_args = ["модуль к установке"]
+loader_desc = "без описания"
 
-updaterTitle = "flxpr-updater"
-updaterCommands = ["flxpr-updater", "updater", "fupdater", "fupd"]
-updaterArguments = ["модуль к обновлению"]
-updaterDescription = "без описания"
+updater_title = "flxpr-updater"
+updater_cmds = ["flxpr-updater", "updater", "fupdater", "fupd"]
+updater_args = ["модуль к обновлению"]
+updater_desc = "без описания"
 
-unloaderTitle = "flxpr-unloader"
-unloaderCommands = ["flxpr-unloader", "unloader", "funloader", "fu"]
-unloaderArguments = ["модуль к деинсталляции"]
-unloaderDescription = "без описания"
-
-defaultInfo = "не указана"
-
-"""
-repository = "<a href='https://github.com/flxprhub/modules'>flxprhub/modules</a>"
-channel = "<a href='https://t.me/flxpr_modules>flxpr-modules</a>"
-creator = "<a href='https://t.me/flxpr'>vadim</a>"
-website = "<a href='https://flxpr.ru/modules'>flxpr.ru</a>"
-version = "1.0.0"
-env = "production"
-"""
+unloader_title = "flxpr-unloader"
+unloader_cmds = ["flxpr-unloader", "unloader", "funloader", "fu"]
+unloader_args = ["модуль к деинсталляции"]
+unloader_desc = "без описания"
 
 repository = "github.com/flxprhub/modules"
 creator = "@flxpr"
 channel = "@flxpr_modules"
 website = "flxpr.ru/modules"
-version = "1.1.2"
-# env = "production"
+version = "2.0.0"
 
 
-@module(cmds=coreCommands, args=coreArguments, description=coreDescription)
-async def core_cmd(_, message: Message):
-    try:
-        await message.edit(
-            f"<b>{coreTitle}</b>"
-            f"\n\nВерсия: <code>{version}</code>"
-            f"\n\nКанал с модулями: <b>{channel}</b>"
-            f"\nРепозиторий на <b>GitHub'е</b>: <b>{repository}</b>"
-            f"\n\nПрочее (список команд итп): <code>,h flxpr-core</code>",
-            disable_web_page_preview=True
-        )
-    except IndexError:
-        await message.edit(
-            f"<b>{coreTitle}</b>"
-            f"\n\nНе указан один из <b>обязательных</b> параметров"
-        )
+@module(
+    cmds=core_cmds,
+    args=core_args,
+    desc=core_desc
+)
+
+async def core(_, message: Message):
+    await message.edit(
+        f"<b>{core_title}</b>"
+        f"\n\n<b>Версия</b>: <code>{version}</code>"
+        f"\n\n<b>Канал с модулями</b>: {channel}"
+        f"\n<b>Репозиторий на GitHub</b>: {repository}"
+        f"\n\n<b>Прочая информация о модуле</b>: <code>,h flxpr-core</code>",
+        disable_web_page_preview=True
+    )
 
 
-@module(cmds=loaderCommands, args=loaderArguments, description=loaderDescription)
-async def loader_cmd(_, message: Message):
+@module(
+    cmds=loader_cmds,
+    args=loader_args,
+    desc=loader_desc
+)
+
+async def loader(_, message: Message):
     try:
         name = message.command[1].split("/")[-1].replace(".py", "")
 
         await message.edit(
-            f"<b>{loaderTitle}</b>"
-            f"\n\nНачинаю установку модуля <b>{name}</b>"
+            f"<b>{loader_title}</b>" f"\n\n<i>Устанавливаю модуль</i> <code>{name}</code>"
         )
 
-        await message.edit(
-            f"<b>{loaderTitle}</b>" f"\n\nУстанавливаю модуль <b>{name}</b>"
-        )
-
-        if f"custom.{name}" in modules_dict.deleted or modules_dict.module_in(
-            f"custom.{name}"
-        ):
+        if modules_dict.module_in(f"custom.{name}"):
             await message.edit(
-                f"<b>{loaderTitle}</b>"
-                f"\n\nМодуль уже был установлен ранее, используйте <code>,fupd {name}</code> для его обновления"
+                f"<b>{loader_title}</b>"
+                f"\n\n<i>Модуль уже был установлен ранее, используйте</i> <code>,fupd {name}</code> <i>для его обновления</i>"
             )
-
             return
 
         async with session.get(
@@ -95,8 +78,9 @@ async def loader_cmd(_, message: Message):
         ) as response:
             if not response.ok:
                 await message.edit(
-                    f"<b>{loaderTitle}</b>"
-                    f"\n\nДанного модуля нет в репозитории на <b>GitHub'е</b>"
+                    f"<b>{loader_title}</b>"
+                    f"\n\n<i>Данного модуль не найден в репозитории на GitHub</i>",
+                    f"\n<i>(узнать ссылку на репозиторий можно, написав команду</i><code>,fc</code>)"
                 )
                 return
             else:
@@ -104,52 +88,54 @@ async def loader_cmd(_, message: Message):
 
         async with open(f"custom/{name}.py", "wb") as f:
             await message.edit(
-                f"<b>{loaderTitle}</b>" f"\n\nМодуль найден, устанавливаю"
+                f"<b>{loader_title}</b>" f"\n\n<i>Модуль найден, устанавливаю</i>"
             )
 
             await f.write(data)
 
             await message.edit(
-                f"<b>{loaderTitle}</b>"
-                f"\n\nУстановка прошла <b>успешно</b>"
-                f"\n<b>Спасибо</b> за использование моих модулей"
+                f"<b>{loader_title}</b>"
+                f"\n\n<i>Модуль</i> <code>{name}</code> <i>установлен</i>"
+                f"\n<i>Бот будет перезагружен для применения изменений, при старте вы будете оповещены</i>"
             )
             restart(message, "restart")
     except IndexError:
         await message.edit(
-            f"<b>{coreTitle}</b>"
-            f"\n\nНе указан один из <b>обязательных</b> параметров"
+            f"<b>{core_title}</b>"
+            f"\n\n<i>Не указан один из</i> <b>обязательных</b> <i>параметров</i>"
         )
 
 
-@module(cmds=updaterCommands, args=updaterArguments, description=updaterDescription)
-async def updater_cmd(_, message: Message):
+@module(
+    cmds=updater_cmds,
+    args=updater_args,
+    desc=updater_desc
+)
+
+async def updater(_, message: Message):
     try:
         name = message.command[1].split("/")[-1].replace(".py", "")
 
         await message.edit(
-            f"<b>{updaterTitle}</b>"
-            f"\n\nНачинаю обновление модуля <b>{name}</b>"
+            f"<b>{updater_title}</b>"
+            f"\n\n<i>Начинаю обновление модуля</i> <b>{name}</b>"
         )
 
-        '''
-        if f"custom.{name}" in modules_dict.deleted or modules_dict.module_in(
-            f"custom.{name}"
-        ):
+        if not modules_dict.module_in(f"custom.{name}"):
             await message.edit(
-                f"<b>{updaterTitle}</b>"
-                f"\n\nМодуль не был установлен ранее, используйте <code>,fl {name}</code> для его установки"
+                f"<b>{updater_title}</b>"
+                f"\n\n<i>Модуль не был установлен ранее, используйте</i> <code>,fl {name}</code> <i>для его установки</i>"
             )
             return
-        '''
 
         async with session.get(
             f"https://raw.githubusercontent.com/flxprhub/modules/master/{name}.py"
         ) as response:
             if not response.ok:
                 await message.edit(
-                    f"<b>{loaderTitle}</b>"
-                    f"\n\nДанного модуля нет в репозитории на <b>GitHub'е</b>"
+                    f"<b>{loader_title}</b>"
+                    f"\n\n<i>Данного модуль не найден в репозитории на GitHub</i>",
+                    f"\n<i>(узнать ссылку на репозиторий можно, написав команду</i><code>,fc</code>)"
                 )
                 return
             else:
@@ -157,45 +143,53 @@ async def updater_cmd(_, message: Message):
 
         async with open(f"custom/{name}.py", "wb") as f:
             await message.edit(
-                f"<b>{updaterTitle}</b>" f"\n\nМодуль найден, <b>обновляю</b>"
+                f"<b>{updater_title}</b>" 
+                f"\n\n<i>Модуль найден,</i> <b>обновляю</b>"
             )
             await f.write(data)
 
             await message.edit(
-                f"<b>{updaterTitle}</b>" f"\n\nМодуль обновлен, <b>спасибо</b> за использование моих модулей!"
+                f"<b>{updater_title}</b>" 
+                f"\n\n<i>Модуль</i> <code>{name}</code> <i>обновлен</i>"
+                f"\n<i>Бот будет перезагружен для применения изменений, при старте вы будете оповещены</i>"
             )
             restart(message, "restart")
     except IndexError:
         await message.edit(
-            f"<b>{coreTitle}</b>"
-            f"\n\nНе указан один из <b>обязательных</b> параметров"
+            f"<b>{core_title}</b>"
+            f"\n\n<i>Не указан один из</i> <b>обязательных</b> <i>параметров</i>"
         )
 
 
-@module(cmds=unloaderCommands, args=unloaderArguments, description=unloaderDescription)
-async def unloader_cmd(_, message: Message):
+@module(
+    cmds=unloader_cmds,
+    args=unloader_args,
+    desc=unloader_desc
+)
+
+async def unloader(_, message: Message):
     try:
         name = message.command[1].split("/")[-1].replace(".py", "")
 
         await message.edit(
-            f"<b>{unloaderTitle}</b>" f"\n\nНачинаю удаление модуля <b>{name}</b>"
+            f"<b>{unloader_title}</b>" f"\n\n<i>Начинаю удаление модуля</i> <b>{name}</b>"
         )
 
         if name + ".py" not in os.listdir("custom"):
-            await message.edit(f"<b>{unloaderTitle}</b>" f"\n\nМодуль не найден")
+            await message.edit(f"<b>{unloader_title}</b>" f"\n\n<i>Указанный модуль не найден</i>")
             return
 
         os.remove(f"custom/{name}.py")
         await unload_module(f"custom.{name}")
         await message.edit(
-            f"<b>{unloaderTitle}</b>" f"\n\nМодуль <b>{name}</b> успешно удален"
+            f"<b>{unloader_title}</b>" f"\n\n<i>Модуль</i> <b>{name}</b> <i>успешно удален</i>"
         )
 
         restart(message, "restart")
     except IndexError:
         await message.edit(
-            f"<b>{coreTitle}</b>"
-            f"\n\nНе указан один из <b>обязательных</b> параметров"
+            f"<b>{core_title}</b>"
+            f"\n\n<i>Не указан один из</i> <b>обязательных</b> <i>параметров</i>"
         )
 
 
