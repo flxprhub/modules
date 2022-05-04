@@ -9,7 +9,7 @@ description = "модуль для управления базой данных 
 
 channel = "@flxpr_modules"
 creator = "@flxpr"
-website = "flxpr.ru/modules"
+website = "flxpr.ml"
 
 @module(cmds=commands, args=arguments, description=description)
 async def database(_, message: Message):
@@ -22,24 +22,24 @@ async def database(_, message: Message):
             db.set(value, insert)
             await message.edit(
                 f"<b>{moduleTitle}</b>"
-                f"\n\naffafaafПараметру <code>{value}</code> присвоено значение <code>{insert}</code>"
+                f"\n\n<i>Параметру</i> <code>{value}</code> <i>присвоено значение</i> <code>{insert}</code>"
             )
         elif method == "get":
             getvalue = db.get(value)
             await message.edit(
                 f"<b>{moduleTitle}</b>"
-                f"\n\nПараметр <code>{value}</code> имеет значение <code>{getvalue}</code>"
+                f"\n\n<i>Параметр</i> <code>{value}</code> <i>имеет значение</i> <code>{getvalue}</code>"
             )
         elif method == "remove":
             db.remove(value)
             await message.edit(
                 f"<b>{moduleTitle}</b>"
-                f"\n\nПараметр <code>{value}</code> лишён значения"
+                f"\n\n<i>Параметр</i> <code>{value}</code> <i>лишён значения</i>"
             )
     except IndexError:
         await message.edit(
            f"<b>{coreTitle}</b>"
-           f"\n\nНе указан один из <b>обязательных</b> параметров"
+           f"\n\n<i>Не указан один из</i> <b>обязательных</b> <i>параметров</i>"
        )
     
 made_by = f"{channel} | {creator} | {website}"
