@@ -22,7 +22,7 @@ async def database(_, message: Message):
             db.set(value, insert)
             await message.edit(
                 f"<b>{moduleTitle}</b>"
-                f"\n\nПараметру <code>{value}</code> присвоено значение <code>{insert}</code>"
+                f"\n\naffafaafПараметру <code>{value}</code> присвоено значение <code>{insert}</code>"
             )
         elif method == "get":
             getvalue = db.get(value)
