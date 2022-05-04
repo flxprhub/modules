@@ -31,7 +31,7 @@ unloader_desc = "без описания"
 creator = "@flxpr"
 channel = "@flxpr_modules"
 website = "flxpr.ml"
-version = "2.1.0"
+version = "2.1.1"
 
 
 @module(
@@ -72,7 +72,7 @@ async def loader(_, message: Message):
             return
 
         async with session.get(
-            f"https://modules.flxpr.ml/{name}.py"
+            f"https://modules.cdn.flxpr.ml/{name}.py"
         ) as response:
             if not response.ok:
                 await message.edit(
@@ -126,7 +126,7 @@ async def updater(_, message: Message):
             return
 
         async with session.get(
-            f"https://modules.flxpr.ml/{name}.py"
+            f"https://modules.cdn.flxpr.ml/{name}.py"
         ) as response:
             if not response.ok:
                 await message.edit(
