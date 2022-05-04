@@ -28,11 +28,10 @@ unloader_cmds = ["flxpr-unloader", "unloader", "funloader", "fu"]
 unloader_args = ["модуль к деинсталляции"]
 unloader_desc = "без описания"
 
-repository = "github.com/flxprhub/modules"
 creator = "@flxpr"
 channel = "@flxpr_modules"
 website = "flxpr.ru/modules"
-version = "2.0.0"
+version = "2.1.0"
 
 
 @module(
@@ -46,7 +45,6 @@ async def core(_, message: Message):
         f"<b>{core_title}</b>"
         f"\n\n<b>Версия</b>: <code>{version}</code>"
         f"\n\n<b>Канал с модулями</b>: {channel}"
-        f"\n<b>Репозиторий на GitHub</b>: {repository}"
         f"\n\n<b>Прочая информация о модуле</b>: <code>,h flxpr-core</code>",
         disable_web_page_preview=True
     )
@@ -74,13 +72,12 @@ async def loader(_, message: Message):
             return
 
         async with session.get(
-            f"https://raw.githubusercontent.com/flxprhub/modules/master/{name}.py"
+            f"https://modules.flxpr.ml/{name}.py"
         ) as response:
             if not response.ok:
                 await message.edit(
                     f"<b>{loader_title}</b>"
-                    f"\n\n<i>Данного модуль не найден в репозитории на GitHub</i>",
-                    f"\n<i>(узнать ссылку на репозиторий можно, написав команду</i><code>,fc</code>)"
+                    f"\n\n<i>Модуль не найден</i>"
                 )
                 return
             else:
@@ -129,13 +126,12 @@ async def updater(_, message: Message):
             return
 
         async with session.get(
-            f"https://raw.githubusercontent.com/flxprhub/modules/master/{name}.py"
+            f"https://modules.flxpr.ml/{name}.py"
         ) as response:
             if not response.ok:
                 await message.edit(
                     f"<b>{loader_title}</b>"
-                    f"\n\n<i>Данного модуль не найден в репозитории на GitHub</i>",
-                    f"\n<i>(узнать ссылку на репозиторий можно, написав команду</i><code>,fc</code>)"
+                    f"\n\n<i>Модуль не найден</i>"
                 )
                 return
             else:
