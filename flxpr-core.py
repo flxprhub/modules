@@ -30,7 +30,7 @@ unloader_desc = "без описания"
 
 creator = "@flxpr"
 channel = "@flxpr_modules"
-website = "flxpr.ru/modules"
+website = "flxpr.ml"
 version = "2.1.0"
 
 
